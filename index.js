@@ -11,9 +11,10 @@ module.exports = function Model(schema){
   var backend;
   var validate;
 
+  // note validate function is curried since schema is immutable
   model.validator = function(_){
     if (arguments.length == 0) return validate;
-    validate = _; return this;
+    validate = _.bind(null,schema); return this;
   }
 
   model.backend = function(_){
@@ -26,25 +27,28 @@ module.exports = function Model(schema){
   }
 
   function model(obj){
-    var struct = {
-      valid:    function(){ return this.validate().valid(); },
-      errors:   function(){ return this.validate().errors(); },
-      validate: function(){ return validate(schema, this.value()); },
-      set:      function(k,v){ return this.value[k].set(v); },
-      value: ObservStruct( parsed(obj) ),
-      dirty: function(){ return dirty; },
-      _delegate: {}
-    };
-
     var dirty = false;
+
+    var struct = Object.create(ModelProto);
+    struct.value  = ObservStruct( parsed(obj) );
+    struct.dirty  = function(){ return dirty; };
+    struct._delegate = {};
+
     var _refresh = refresh(struct,backend);
 
     struct.value( function(){ dirty = true; } );  //  on value mutation, set dirty 
-    struct.value( _refresh );    // on value mutation, rebind delegate
+    struct.value( _refresh );                     //  on value mutation, rebind delegate
     
-    _refresh(obj);
+    _refresh(struct.value());   // bind delegate initially
     
     return struct;
+  }
+
+  var ModelProto = {
+    valid:    function(){ return this.validate().valid(); },
+    errors:   function(){ return this.validate().errors(); },
+    validate: function(){ return validate(this.value()); },
+    set:      function(k,v){ return this.value[k].set(v); }
   }
 
   return model;
