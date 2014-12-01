@@ -58,21 +58,22 @@ function parsed(obj){
   return ret;
 }
 
-function refresh(m,factory){
+function refresh(m,backend){
   return function(value){
-    var backend = factory();
-    compile(m.validate().links(),backend);
-    bindDelegate(m, '_delegate', backend(value) );
+    var links = cleanLinks(m.validate().links());
+    bindDelegate(m, '_delegate', backend(value,links) );
   }
 }
 
-function compile(links,backend){
+function cleanLinks(links){
+  var ret = [];
   for (var i=0; i<links.length; ++i){
     var link = links[i];
     if ( BLACKLIST.indexOf(link.rel) >= 0 ) 
       throw new Error('Unable to build link: ' + link.rel);
-    backend.link(links[i]);
+    ret.push(links[i]);
   }
+  return ret;
 }
 
 function unbindDelegate(target, meth){

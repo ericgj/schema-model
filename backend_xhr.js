@@ -2,9 +2,7 @@
 
 var Backend = require('backend');
 
-module.exports = function(){
-  return Backend().mediaType('application/json', json);
-}
+module.exports = Backend().mediaType('application/json', json);
 
 function json(link, data, fn){
   var method = link.method || 'GET';

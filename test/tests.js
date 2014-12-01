@@ -49,7 +49,7 @@ describe('Model core : ', function(){
                    .link({ rel: 'update'})
                    .link({ rel: 'delete'})
                   ;
-    subject.backend(backend);
+    subject.backend(backend());
 
     var inst = {id: 123, title: 'Beyond a Boundary', author: 'James', status: 'draft'}
     var actual = subject(inst);
@@ -72,7 +72,7 @@ describe('Model core : ', function(){
                    .link({ rel: 'update'})
                    .link({ rel: 'delete'})
                   ;
-    subject.backend(backend);
+    subject.backend(backend());
 
     var inst = {id: 456, title: 'Arusha Declaration', author: 'Nyerere', status: 'new'}
     var actual = subject(inst);
@@ -94,7 +94,7 @@ describe('Model core : ', function(){
 
   it('invalid instances should be invalid, have errors, and have no links', function(){
     var backend = MockBackend();
-    subject.backend(backend);
+    subject.backend(backend());
 
     var inst = {id: 789, title: 'Men in Prison', author: 'Serge' }
     var actual = subject(inst);
@@ -154,16 +154,12 @@ function MockBackend(){
 
   function mock(){
     
-    actlinks = [];  calls = [];  // a bit shitty, but necessary given state needed in parent scope
-    
-    compiled.link = function(l){
-      actlinks.push(l); return this;
-    }
-
-    function compiled(){
+    function compiled(inst,links){
       var obj = {};
-      for (var i=0; i<actlinks.length; ++i){
-        var link = actlinks[i];
+      actlinks = [];  calls = [];  // a bit shitty, but necessary given state needed in parent scope
+      for (var i=0; i<links.length; ++i){
+        var link = links[i];
+        actlinks.push(link);
         obj[link.rel] = function(){
           calls.push([ link, [].slice.call(arguments,0) ]);
         }
