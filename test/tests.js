@@ -80,7 +80,7 @@ describe('Model core : ', function(){
     actual.list();
     actual.create();
 
-    actual.value.status.set('draft');
+    actual.set('status','draft');
 
     assert.equal( actual.dirty(), true );
     console.debug( this.test.fullTitle() + " : value after :: %o", actual.value() );

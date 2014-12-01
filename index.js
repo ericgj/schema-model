@@ -4,7 +4,7 @@ var Observ = require('observ')
   , ObservStruct = require('observ-struct')
   , BackendXHR = require('./backend_xhr')
 
-var BLACKLIST = ['valid','validate','errors','value','dirty','_delegate'];
+var BLACKLIST = ['valid','validate','errors','value','set','dirty','_delegate'];
 
 module.exports = function Model(schema){
 
@@ -30,6 +30,7 @@ module.exports = function Model(schema){
       valid:    function(){ return this.validate().valid(); },
       errors:   function(){ return this.validate().errors(); },
       validate: function(){ return validate(schema, this.value()); },
+      set:      function(k,v){ return this.value[k].set(v); },
       value: ObservStruct( parsed(obj) ),
       dirty: function(){ return dirty; },
       _delegate: {}
