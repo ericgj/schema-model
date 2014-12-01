@@ -92,6 +92,17 @@ describe('Model core : ', function(){
      
   })
 
+  it('invalid instances should be invalid, have errors, and have no links', function(){
+    var backend = MockBackend();
+    subject.backend(backend);
+
+    var inst = {id: 789, title: 'Men in Prison', author: 'Serge' }
+    var actual = subject(inst);
+    console.debug( this.test.fullTitle() + " : errors :: %o", actual.errors() );
+    assert.equal( actual.valid(), false );
+
+  })
+
 })
 
 
