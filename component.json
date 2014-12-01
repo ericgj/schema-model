@@ -7,10 +7,16 @@
   "dependencies": {
     "ericgj/observ": "master",
     "ericgj/observ-struct": "master",
-    "ericgj/jesquema": "master",
-    "ericgj/backend":  "master"
+    "ericgj/backend": "master",
+    "ericgj/xtend": "*",
+    "ericgj/uritemplate": "*",
+    "segmentio/extend": "*",
+    "component/type": "*"
   },
-  "development": {},
+  "development": {
+    "ericgj/jesquema": "master",
+    "timoxley/assert": "master"
+  },
   "license": "MIT",
   "main": "index.js",
   "scripts": [

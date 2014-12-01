@@ -2,15 +2,19 @@
 
 var Observ = require('observ')
   , ObservStruct = require('observ-struct')
-  , Validator = require('jesquema')
   , BackendXHR = require('./backend_xhr')
 
-var BLACKLIST = ['valid','validate','value','dirty','_delegate'];
+var BLACKLIST = ['valid','validate','errors','value','dirty','_delegate'];
 
 module.exports = function Model(schema){
 
   var backend;
-  var validate = Validator('4').schema(schema).results;
+  var validate;
+
+  model.validator = function(_){
+    if (arguments.length == 0) return validate;
+    validate = _; return this;
+  }
 
   model.backend = function(_){
     if (arguments.length == 0) return backend;
@@ -24,14 +28,15 @@ module.exports = function Model(schema){
   function model(obj){
     var struct = {
       valid:    function(){ return this.validate().valid(); },
-      validate: function(){ return validate(this.value()); },
+      errors:   function(){ return this.validate().errors(); },
+      validate: function(){ return validate(schema, this.value()); },
       value: ObservStruct( parsed(obj) ),
       dirty: function(){ return dirty; },
       _delegate: {}
     };
 
     var dirty = false;
-    var _refresh = refresh(struct,backend());
+    var _refresh = refresh(struct,backend);
 
     struct.value( function(){ dirty = true; } );  //  on value mutation, set dirty 
     struct.value( _refresh );    // on value mutation, rebind delegate
@@ -48,12 +53,13 @@ module.exports = function Model(schema){
 // TODO ideally this would return readonly values as non-observed values
 function parsed(obj){
   var ret = {};
-  for (k in obj) ret[k] = Observ(obj[k]);
+  for (var k in obj) ret[k] = Observ(obj[k]);
   return ret;
 }
 
-function refresh(m,backend){
+function refresh(m,factory){
   return function(value){
+    var backend = factory();
     compile(m.validate().links(),backend);
     bindDelegate(m, '_delegate', backend(value) );
   }
