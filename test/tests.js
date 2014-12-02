@@ -2,11 +2,11 @@
 
 var Model = require('schema-model');
 var Backend = require('ericgj-backend');
-var Validator = require('jesquema');
+var V = require('jesquema')('4');
 var assert = require('assert');
 
 function validate(schema,instance){
-  return Validator('4').schema(schema)(instance);
+  return V(schema,instance);
 }
 
 describe('Model core : ', function(){
